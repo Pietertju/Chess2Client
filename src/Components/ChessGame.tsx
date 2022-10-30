@@ -4,6 +4,8 @@ import { BlackPawn, BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, 
 import { Move } from "../Models/Move";
 import { Square } from "../Models/Square";
 import ChessBoard from "./ChessBoard";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 interface State {
     PlayersTurn: ChessColors
@@ -15,6 +17,7 @@ interface State {
     BlackKingSideCastle: Boolean;
     BlackQueenSideCastle: Boolean;
     PreviousMove: Move;
+    PromotionModal: Boolean;
 }
 
 interface ChessGameProps {
@@ -56,7 +59,8 @@ class ChessGame extends Component<ChessGameProps, State> {
             WhiteQueenSideCastle: true,
             BlackKingSideCastle: true,
             BlackQueenSideCastle: true,
-            PreviousMove: testPreviousMove
+            PreviousMove: testPreviousMove,
+            PromotionModal: false
         }
     }
 
@@ -65,6 +69,27 @@ class ChessGame extends Component<ChessGameProps, State> {
             <div className="ChessGame">
                 <ChessBoard MakeMove={this.MakeMove} PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
                 <h1>Move: {this.state.PlayersTurn}</h1>
+
+                <Modal show={this.state.PromotionModal as boolean} onHide={this.hideModal}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Promotion</Modal.Title>
+                    </Modal.Header>
+                <Modal.Body>Woohoo, you're promoting your pawn! To which piece do you want to promote</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Knight)}}>
+                            Knight
+                        </Button>
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Bishop)}}>
+                            Bishop
+                        </Button>
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Rook)}}>
+                            Rook
+                        </Button>
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Queen)}}>
+                            Queen
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         )
     }
@@ -86,7 +111,21 @@ class ChessGame extends Component<ChessGameProps, State> {
         this.showPossibleMoves(newSquare)
     }
 
+    promotePiece = (piece: ChessPieceEnum) => {
+        let copyOfGrid : ChessPieceModel[][]
+        copyOfGrid = this.state.Grid.slice()
+
+        let oppositeColor = (this.state.PlayersTurn === ChessColors.White) ? ChessColors.Black : ChessColors.White
+
+        copyOfGrid[this.state.PreviousMove.to.row][this.state.PreviousMove.to.column].type = piece
+
+        this.setState({
+            Grid: copyOfGrid
+        })
+    }
+
     MakeMove = (move: Move) => {
+        if(this.state.PromotionModal) return;
         let copyOfGrid : ChessPieceModel[][]
         copyOfGrid = this.state.Grid.slice()
 
@@ -102,13 +141,16 @@ class ChessGame extends Component<ChessGameProps, State> {
         let whiteKingSideCastle = this.state.WhiteKingSideCastle;
         let whiteQueenSideCastle = this.state.WhiteQueenSideCastle;
 
-        
+        let promotion = false;
 
         if(piece.type === ChessPieceEnum.Pawn) {
             if(from.column !== to.column) {
                 if(copyOfGrid[to.row][to.column].type === ChessPieceEnum.Empty) {
-                    copyOfGrid[from.row][to.column] = EmptySpace
+                    copyOfGrid[from.row][to.column] = EmptySpace()
                 }
+            }
+            if(to.row === 0 || to.row === 7) {
+                promotion = true;
             }
         } else if(piece.type === ChessPieceEnum.King) {
             if(color === ChessColors.Black) {
@@ -117,13 +159,13 @@ class ChessGame extends Component<ChessGameProps, State> {
 
                 if(to.column > from.column) {
                     if(to.column - from.column === 2) {
-                        copyOfGrid[from.row][7] = EmptySpace
-                        copyOfGrid[from.row][5] = BlackRook
+                        copyOfGrid[from.row][7] = EmptySpace()
+                        copyOfGrid[from.row][5] = BlackRook()
                     }
                 } else if(from.column > to.column) {
                     if(from.column - to.column === 2) {
-                        copyOfGrid[from.row][0] = EmptySpace
-                        copyOfGrid[from.row][3] = BlackRook
+                        copyOfGrid[from.row][0] = EmptySpace()
+                        copyOfGrid[from.row][3] = BlackRook()
                     }
                 }
             } else if(color === ChessColors.White) {
@@ -132,13 +174,13 @@ class ChessGame extends Component<ChessGameProps, State> {
 
                 if(to.column > from.column) {
                     if(to.column - from.column === 2) {
-                        copyOfGrid[from.row][7] = EmptySpace
-                        copyOfGrid[from.row][5] = WhiteRook
+                        copyOfGrid[from.row][7] = EmptySpace()
+                        copyOfGrid[from.row][5] = WhiteRook()
                     }
                 } else if(from.column > to.column) {
                     if(from.column - to.column === 2) {
-                        copyOfGrid[from.row][0] = EmptySpace
-                        copyOfGrid[from.row][3] = WhiteRook
+                        copyOfGrid[from.row][0] = EmptySpace()
+                        copyOfGrid[from.row][3] = WhiteRook()
                     }
                 }
             }
@@ -159,7 +201,7 @@ class ChessGame extends Component<ChessGameProps, State> {
             }
         }
 
-        copyOfGrid[from.row][from.column] = EmptySpace
+        copyOfGrid[from.row][from.column] = EmptySpace()
         copyOfGrid[to.row][to.column] = piece
 
         this.setState({
@@ -169,9 +211,10 @@ class ChessGame extends Component<ChessGameProps, State> {
             BlackKingSideCastle: blackKingSideCastle,
             BlackQueenSideCastle: blackQueenSideCastle,
             WhiteKingSideCastle: whiteKingSideCastle,
-            WhiteQueenSideCastle: whiteQueenSideCastle
+            WhiteQueenSideCastle: whiteQueenSideCastle,
+            PromotionModal: promotion
         })
-        this.SelectPiece(this.state.SelectedSquare) 
+        this.SelectPiece(this.state.SelectedSquare)
     }
 
     getSquare = (row: Number, col: Number) => {
@@ -625,7 +668,7 @@ class ChessGame extends Component<ChessGameProps, State> {
         nextMoveGrid = this.state.Grid.map(item => ({...item}))
 
         let movedPiece = nextMoveGrid[move.from.row][move.from.column]
-        nextMoveGrid[move.from.row][move.from.column] = EmptySpace
+        nextMoveGrid[move.from.row][move.from.column] = EmptySpace()
         nextMoveGrid[move.to.row][move.to.column] = movedPiece
 
         return this.currentlyInCheck(nextMoveGrid)
@@ -655,18 +698,23 @@ class ChessGame extends Component<ChessGameProps, State> {
         return false;
     }
 
+    hideModal = () =>  {
+        this.setState({
+            PromotionModal: false
+        })
+    }
 
     initializeChessBoard = () => {
         let grid : ChessPieceModel[][]
         grid = [
-            [BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, BlackBishop, BlackKnight, BlackRook],
-            [BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn, BlackPawn],
-            [EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace],
-            [BlackQueen, EmptySpace, BlackPawn, WhitePawn, EmptySpace, EmptySpace, EmptySpace, EmptySpace],
-            [EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace, WhitePawn, BlackPawn, EmptySpace],
-            [EmptySpace, WhiteQueen, BlackPawn, EmptySpace, EmptySpace, EmptySpace, EmptySpace, EmptySpace],
-            [WhiteBishop, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn, WhitePawn],
-            [WhiteRook, WhiteKnight, WhiteKnight, EmptySpace, WhiteKing, EmptySpace, EmptySpace, WhiteRook],
+            [BlackRook(), BlackKnight(), BlackBishop(), BlackQueen(), BlackKing(), BlackBishop(), BlackKnight(), BlackRook()],
+            [BlackPawn(), BlackPawn(), BlackPawn(), BlackPawn(), BlackPawn(), BlackPawn(), BlackPawn(), BlackPawn()],
+            [EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace()],
+            [BlackQueen(), EmptySpace(), BlackPawn(), WhitePawn(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace()],
+            [EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), WhitePawn(), BlackPawn(), EmptySpace()],
+            [EmptySpace(), WhiteQueen(), BlackPawn(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace(), EmptySpace()],
+            [WhiteBishop(), WhitePawn(), WhitePawn(), WhitePawn(), WhitePawn(), WhitePawn(), WhitePawn(), WhitePawn()],
+            [WhiteRook(), WhiteKnight(), WhiteKnight(), EmptySpace(), WhiteKing(), EmptySpace(), EmptySpace(), WhiteRook()],
         ]
 
         return grid;
