@@ -13,7 +13,7 @@ interface ChessSquareProps {
     Square: Square;
     Color: ChessColors;
     Piece: ChessPieceModel;
-    Text: Number;
+    Text: String;
     SelectPiece: (square: Square) => void;
     PossibleMove: Boolean
     SelectedSquare: Boolean

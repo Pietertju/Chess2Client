@@ -27,7 +27,7 @@ class ChessBoard extends Component<ChessBoardProps, State> {
 
     render() {
         let white = false;
-        let text = 1;
+
         return(
             <div className="ChessBoard">
                 {this.props.grid.map((row, rowIndex) => {
@@ -43,7 +43,7 @@ class ChessBoard extends Component<ChessBoardProps, State> {
                             let possible = (this.props.PossibleDestinations.filter(e => e.row === rowIndex && e.column === column).length > 0)
                             let selected = (this.props.SelectedSquare.column === column) && (this.props.SelectedSquare.row === rowIndex)
                             return (
-                                <ChessSquare SelectedSquare={selected}PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={text++}/>
+                                <ChessSquare SelectedSquare={selected}PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={(rowIndex + " - " + column) as string}/>
                             );
                         })}
                     </div>
