@@ -1,13 +1,31 @@
-import React from 'react';
+import React, { Component } from "react";
+import ChessGame from "./ChessGame";
 
-import '../Styles/Main.scss';
+interface State {
+    
+}
 
-function Main() {
-  return (
-    <div className="App">
-      Test
-    </div>
-  );
+interface MainProps {
+    
+}
+
+class Main extends Component<MainProps, State> {   
+
+    constructor(props: MainProps) {
+        super(props);
+
+        this.state = {
+  
+        }
+    }
+
+    render() {
+        return(
+            <div className="MainContainer">
+                <ChessGame />
+            </div>
+        )
+    }
 }
 
 export default Main;

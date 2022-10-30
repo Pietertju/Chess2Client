@@ -1,0 +1,25 @@
+.ChessSquare {
+    width: 75px;
+    height: 75px;
+    border: 1px solid black;
+    font-weight: bold;
+}
+
+.BlackSquare {
+    background-color: gray;
+    color: black;
+
+}
+
+.WhiteSquare {
+    background-color: whitesmoke;
+    color:black;
+}
+
+.PossibleMove {
+    background-color: blue;
+}
+
+.SelectedSquare {
+    background-color: green;
+}
