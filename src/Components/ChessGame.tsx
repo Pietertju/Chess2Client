@@ -260,33 +260,41 @@ class ChessGame extends Component<ChessGameProps, State> {
 
         let oppositeColor = (color === ChessColors.White) ? ChessColors.Black : ChessColors.White
 
-        if(this.getPieceOnSquare(square.row - (1*direction), square.column, grid).type === ChessPieceEnum.Empty) {
-            possibleDestinations.push(this.getSquare(square.row - (1*direction), square.column))
+        let targetSquare1 = { row: square.row - (1*direction), column: square.column }
+        if(this.inBounds(targetSquare1)) {
+            if(this.getPieceOnSquare(targetSquare1.row, targetSquare1.column, grid).type === ChessPieceEnum.Empty) {
+                possibleDestinations.push(this.getSquare(targetSquare1.row, targetSquare1.column))
+                let targetSquare2 = { row: square.row - (2*direction), column: square.column }
+                if(this.inBounds(targetSquare2)) {
+                    if(square.row === 6 && color === ChessColors.White) {
 
-            if(square.row === 6 && color === ChessColors.White) {
-                if(this.getPieceOnSquare(square.row - (2*direction), square.column, grid).type === ChessPieceEnum.Empty) {
-                    possibleDestinations.push(this.getSquare(square.row - (2*direction), square.column))
-                }
-            }
+                        if(this.getPieceOnSquare(targetSquare2.row, targetSquare2.column, grid).type === ChessPieceEnum.Empty) {
+                            possibleDestinations.push(this.getSquare(targetSquare2.row, targetSquare2.column))
+                        }
+                    }
 
-            if(square.row === 1 && color === ChessColors.Black) {
-                if(this.getPieceOnSquare(square.row - (2*direction), square.column, grid).type === ChessPieceEnum.Empty) {
-                    possibleDestinations.push(this.getSquare(square.row - (2*direction), square.column))
+                    if(square.row === 1 && color === ChessColors.Black) {
+                        if(this.getPieceOnSquare(targetSquare2.row, targetSquare2.column, grid).type === ChessPieceEnum.Empty) {
+                            possibleDestinations.push(this.getSquare(targetSquare2.row, targetSquare2.column))
+                        }
+                    }
                 }
             }
         }
 
-        if(square.column - 1 >= 0) {
-            let possiblePiece = this.getPieceOnSquare(square.row - (1*direction), square.column - 1, grid)
+        let targetSquare3 = { row: square.row - (1*direction), column: square.column - 1 }
+        if(this.inBounds(targetSquare3)) {
+            let possiblePiece = this.getPieceOnSquare(targetSquare3.row, targetSquare3.column, grid)
             if(possiblePiece.type !== ChessPieceEnum.Empty && possiblePiece.color === oppositeColor) {
-                possibleDestinations.push(this.getSquare(square.row - (1*direction), square.column - 1))
+                possibleDestinations.push(this.getSquare(targetSquare3.row, targetSquare3.column))
             }
         }
 
-        if(square.column + 1 <= 7) {
-            let possiblePiece = this.getPieceOnSquare(square.row - (1*direction), square.column + 1, grid)
+        let targetSquare4 = { row: square.row - (1*direction), column: square.column + 1 }
+        if(this.inBounds(targetSquare4)) {
+            let possiblePiece = this.getPieceOnSquare(targetSquare4.row, targetSquare4.column, grid)
             if(possiblePiece.type !== ChessPieceEnum.Empty && possiblePiece.color === oppositeColor) {
-                possibleDestinations.push(this.getSquare(square.row - (1*direction), square.column + 1))
+                possibleDestinations.push(this.getSquare(targetSquare4.row, targetSquare4.column))
             }
         }
 
