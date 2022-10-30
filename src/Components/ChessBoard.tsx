@@ -14,6 +14,7 @@ interface ChessBoardProps {
     grid: ChessPieceModel[][]
     SelectPiece: (square: Square) => void;
     SelectedSquare: Square;
+    SelectedPiece: ChessPieceModel;
     PossibleDestinations: Square[];
     MakeMove: (move: Move) => void;
 }
@@ -45,7 +46,7 @@ class ChessBoard extends Component<ChessBoardProps, State> {
                             let possible = (this.props.PossibleDestinations.filter(e => e.row === rowIndex && e.column === column).length > 0)
                             let selected = (this.props.SelectedSquare.column === column) && (this.props.SelectedSquare.row === rowIndex)
                             return (
-                                <ChessSquare MakeMove={this.props.MakeMove} key={7*rowIndex+column} IsSelected={selected} SelectedSquare={this.props.SelectedSquare} PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={(rowIndex + " - " + column) as string}/>
+                                <ChessSquare SelectedPiece={this.props.SelectedPiece} MakeMove={this.props.MakeMove} key={7*rowIndex+column} IsSelected={selected} SelectedSquare={this.props.SelectedSquare} PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={(rowIndex + " - " + column) as string}/>
                             );
                         })}
                     </div>

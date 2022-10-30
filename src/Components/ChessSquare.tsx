@@ -20,6 +20,7 @@ interface ChessSquareProps {
     PossibleMove: Boolean
     IsSelected: Boolean
     SelectedSquare: Square
+    SelectedPiece: ChessPieceModel
 }
 
 class ChessSquare extends Component<ChessSquareProps, State> {   
@@ -35,8 +36,14 @@ class ChessSquare extends Component<ChessSquareProps, State> {
     ClickSquare = () => {
         if(this.props.PossibleMove) {
             let move = {
+                piece: this.props.SelectedPiece,
                 from: this.props.SelectedSquare,
-                to: this.props.Square
+                to: this.props.Square,
+                promotedTo: {
+                    type: ChessPieceEnum.Empty,
+                    color: ChessColors.Empty
+                } as ChessPieceModel,
+                pieceTaken: this.props.Piece
             }
 
             this.props.MakeMove(move)

@@ -34,20 +34,17 @@ class ChessGame extends Component<ChessGameProps, State> {
             column: -1
         } as Square
 
-        let testPreviousMove = {
-            from: {
-                row: 1,
-                column: 2
-            },
-            to: {
-                row: 3,
-                column: 2
-            }
-        }
+        let DefaultPiece = {
+            type: ChessPieceEnum.Empty,
+            color: ChessColors.Empty
+        } as ChessPieceModel
 
         let defaultMove = {
+            piece: DefaultPiece,
             to: DefaultSquare,
-            from: DefaultSquare
+            from: DefaultSquare,
+            promotedTo: DefaultPiece,
+            pieceTaken: DefaultPiece
         }
 
         this.state = {
@@ -59,7 +56,7 @@ class ChessGame extends Component<ChessGameProps, State> {
             WhiteQueenSideCastle: true,
             BlackKingSideCastle: true,
             BlackQueenSideCastle: true,
-            PreviousMove: testPreviousMove,
+            PreviousMove: defaultMove,
             PromotionModal: false
         }
     }
@@ -67,7 +64,7 @@ class ChessGame extends Component<ChessGameProps, State> {
     render() {
         return(
             <div className="ChessGame">
-                <ChessBoard MakeMove={this.MakeMove} PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
+                <ChessBoard SelectedPiece={(this.inBounds(this.state.SelectedSquare)) ? this.state.Grid[this.state.SelectedSquare.row][this.state.SelectedSquare.column] as ChessPieceModel : { type: ChessPieceEnum.Empty, color: ChessColors.Empty } as ChessPieceModel} MakeMove={this.MakeMove} PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
                 <h1>Move: {this.state.PlayersTurn}</h1>
 
                 <Modal show={this.state.PromotionModal as boolean} onHide={this.hideModal}>
@@ -76,18 +73,18 @@ class ChessGame extends Component<ChessGameProps, State> {
                     </Modal.Header>
                 <Modal.Body>Woohoo, you're promoting your pawn! To which piece do you want to promote</Modal.Body>
                     <Modal.Footer>
-                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Knight)}}>
-                            Knight
-                        </Button>
-                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Bishop)}}>
-                            Bishop
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Queen)}}>
+                            Queen
                         </Button>
                         <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Rook)}}>
                             Rook
                         </Button>
-                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Queen)}}>
-                            Queen
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Bishop)}}>
+                            Bishop
                         </Button>
+                        <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Knight)}}>
+                            Knight
+                        </Button>  
                     </Modal.Footer>
                 </Modal>
             </div>
@@ -112,12 +109,14 @@ class ChessGame extends Component<ChessGameProps, State> {
     }
 
     promotePiece = (piece: ChessPieceEnum) => {
-        let copyOfGrid : ChessPieceModel[][]
+        let copyOfGrid: ChessPieceModel[][]
         copyOfGrid = this.state.Grid.slice()
 
-        let oppositeColor = (this.state.PlayersTurn === ChessColors.White) ? ChessColors.Black : ChessColors.White
-
         copyOfGrid[this.state.PreviousMove.to.row][this.state.PreviousMove.to.column].type = piece
+
+        let copyOfPreviousMove: Move
+        copyOfPreviousMove = this.state.PreviousMove
+        copyOfPreviousMove.promotedTo.type = piece
 
         this.setState({
             Grid: copyOfGrid
