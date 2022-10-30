@@ -3,6 +3,7 @@ import { ChessColors, ChessPieceModel } from "../Models/ChessPiece";
 import ChessSquare from "./ChessSquare";
 import '../Styles/ChessBoard.scss';
 import { Square } from "../Models/Square";
+import { Move } from "../Models/Move";
 
 
 interface State {
@@ -13,7 +14,8 @@ interface ChessBoardProps {
     grid: ChessPieceModel[][]
     SelectPiece: (square: Square) => void;
     SelectedSquare: Square;
-    PossibleDestinations: Square[]
+    PossibleDestinations: Square[];
+    MakeMove: (move: Move) => void;
 }
 
 class ChessBoard extends Component<ChessBoardProps, State> {   
@@ -33,7 +35,7 @@ class ChessBoard extends Component<ChessBoardProps, State> {
                 {this.props.grid.map((row, rowIndex) => {
                     white = !white;
                     return (
-                    <div className="BoardRow">
+                    <div key={rowIndex} className="BoardRow">
                         {row.map((item, column) => {
                             white = !white;
                             let square = {
@@ -43,7 +45,7 @@ class ChessBoard extends Component<ChessBoardProps, State> {
                             let possible = (this.props.PossibleDestinations.filter(e => e.row === rowIndex && e.column === column).length > 0)
                             let selected = (this.props.SelectedSquare.column === column) && (this.props.SelectedSquare.row === rowIndex)
                             return (
-                                <ChessSquare SelectedSquare={selected}PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={(rowIndex + " - " + column) as string}/>
+                                <ChessSquare MakeMove={this.props.MakeMove} key={7*rowIndex+column} IsSelected={selected} SelectedSquare={this.props.SelectedSquare} PossibleMove={possible} SelectPiece={this.props.SelectPiece} Square={square} Color={white ? ChessColors.White  : ChessColors.Black} Piece={item} Text={(rowIndex + " - " + column) as string}/>
                             );
                         })}
                     </div>

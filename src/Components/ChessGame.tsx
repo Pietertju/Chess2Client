@@ -63,7 +63,8 @@ class ChessGame extends Component<ChessGameProps, State> {
     render() {
         return(
             <div className="ChessGame">
-                <ChessBoard PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
+                <ChessBoard MakeMove={this.MakeMove} PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
+                <h1>Move: {this.state.PlayersTurn}</h1>
             </div>
         )
     }
@@ -83,6 +84,94 @@ class ChessGame extends Component<ChessGameProps, State> {
         })
 
         this.showPossibleMoves(newSquare)
+    }
+
+    MakeMove = (move: Move) => {
+        let copyOfGrid : ChessPieceModel[][]
+        copyOfGrid = this.state.Grid.slice()
+
+        let from = move.from
+        let to = move.to
+
+        let piece = copyOfGrid[from.row][from.column] as ChessPieceModel
+        let color = this.state.PlayersTurn
+        let oppositeColor = (color === ChessColors.White) ? ChessColors.Black : ChessColors.White
+        
+        let blackKingSideCastle = this.state.BlackKingSideCastle;
+        let blackQueenSideCastle = this.state.BlackQueenSideCastle;
+        let whiteKingSideCastle = this.state.WhiteKingSideCastle;
+        let whiteQueenSideCastle = this.state.WhiteQueenSideCastle;
+
+        
+
+        if(piece.type === ChessPieceEnum.Pawn) {
+            if(from.column !== to.column) {
+                if(copyOfGrid[to.row][to.column].type === ChessPieceEnum.Empty) {
+                    copyOfGrid[from.row][to.column] = EmptySpace
+                }
+            }
+        } else if(piece.type === ChessPieceEnum.King) {
+            if(color === ChessColors.Black) {
+                blackKingSideCastle = false
+                blackQueenSideCastle = false
+
+                if(to.column > from.column) {
+                    if(to.column - from.column === 2) {
+                        copyOfGrid[from.row][7] = EmptySpace
+                        copyOfGrid[from.row][5] = BlackRook
+                    }
+                } else if(from.column > to.column) {
+                    if(from.column - to.column === 2) {
+                        copyOfGrid[from.row][0] = EmptySpace
+                        copyOfGrid[from.row][3] = BlackRook
+                    }
+                }
+            } else if(color === ChessColors.White) {
+                whiteKingSideCastle = false;
+                whiteQueenSideCastle = false;
+
+                if(to.column > from.column) {
+                    if(to.column - from.column === 2) {
+                        copyOfGrid[from.row][7] = EmptySpace
+                        copyOfGrid[from.row][5] = WhiteRook
+                    }
+                } else if(from.column > to.column) {
+                    if(from.column - to.column === 2) {
+                        copyOfGrid[from.row][0] = EmptySpace
+                        copyOfGrid[from.row][3] = WhiteRook
+                    }
+                }
+            }
+            
+        } else if(piece.type === ChessPieceEnum.Rook) {
+            if(color === ChessColors.White) {
+                if(from.column === 0) {
+                    whiteQueenSideCastle = false;
+                } else if(from.column === 7) {
+                    whiteKingSideCastle = false;
+                }
+            } else if(color === ChessColors.Black) {
+                if(from.column === 0) {
+                    blackQueenSideCastle = false;
+                } else if(from.column === 7) {
+                    blackKingSideCastle = false;
+                }
+            }
+        }
+
+        copyOfGrid[from.row][from.column] = EmptySpace
+        copyOfGrid[to.row][to.column] = piece
+
+        this.setState({
+            PreviousMove: move,
+            Grid: copyOfGrid,
+            PlayersTurn: oppositeColor,
+            BlackKingSideCastle: blackKingSideCastle,
+            BlackQueenSideCastle: blackQueenSideCastle,
+            WhiteKingSideCastle: whiteKingSideCastle,
+            WhiteQueenSideCastle: whiteQueenSideCastle
+        })
+        this.SelectPiece(this.state.SelectedSquare) 
     }
 
     getSquare = (row: Number, col: Number) => {
@@ -120,7 +209,7 @@ class ChessGame extends Component<ChessGameProps, State> {
                             to: possibleDestination
                         } as Move
 
-                        if(!this.anyKingInCheckAfterMove(possibleMove)) {
+                        if(!this.kingInCheckAfterMove(possibleMove)) {
                             finalPossibleMoves.push(possibleDestination)
                         }
                     }
@@ -450,59 +539,66 @@ class ChessGame extends Component<ChessGameProps, State> {
             }
         }
 
-        if(color === ChessColors.Black) {
-            if(this.state.BlackKingSideCastle) {
-                let freeSquare1 = this.getSquare(row, col + 1)
-                let freeSquare2 = this.getSquare(row, col + 2)
-                if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty) {
-                    let checkMoveForCheck = {
-                        from: square,
-                        to: freeSquare2
-                    } as Move
-                    if(!this.anyKingInCheckAfterMove(checkMoveForCheck)) {
-                        possibleDestinations.push(freeSquare2)
+        //castle
+        if(!this.currentlyInCheck(grid)) {
+            if(color === ChessColors.Black) {
+                if(this.state.BlackKingSideCastle) {
+                    let freeSquare1 = this.getSquare(row, col + 1)
+                    let freeSquare2 = this.getSquare(row, col + 2)
+                    if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty) {
+                        let checkMoveForCheck = {
+                            from: square,
+                            to: freeSquare2
+                        } as Move
+
+                        if(!this.kingInCheckAfterMove(checkMoveForCheck)) {
+                            possibleDestinations.push(freeSquare2)                         
+                        }
                     }
                 }
-            }
-            if(this.state.BlackQueenSideCastle) {
-                let freeSquare1 = this.getSquare(row, col - 1)
-                let freeSquare2 = this.getSquare(row, col - 2)
-                let freeSquare3 = this.getSquare(row, col - 3)
-                if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare3.row, freeSquare3.column, grid).type === ChessPieceEnum.Empty) {
-                    let checkMoveForCheck = {
-                        from: square,
-                        to: freeSquare2
-                    } as Move
-                    if(!this.anyKingInCheckAfterMove(checkMoveForCheck)) {
-                        possibleDestinations.push(freeSquare2)
+                if(this.state.BlackQueenSideCastle) {
+                    let freeSquare1 = this.getSquare(row, col - 1)
+                    let freeSquare2 = this.getSquare(row, col - 2)
+                    let freeSquare3 = this.getSquare(row, col - 3)
+                    if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare3.row, freeSquare3.column, grid).type === ChessPieceEnum.Empty) {
+                        let checkMoveForCheck = {
+                            from: square,
+                            to: freeSquare2
+                        } as Move
+
+                        if(!this.kingInCheckAfterMove(checkMoveForCheck)) {
+                            possibleDestinations.push(freeSquare2)
+                        }
                     }
                 }
-            }
-        } else if(color === ChessColors.White) {
-            if(this.state.WhiteKingSideCastle) {
-                let freeSquare1 = this.getSquare(row, col + 1)
-                let freeSquare2 = this.getSquare(row, col + 2)
-                if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty) {
-                    let checkMoveForCheck = {
-                        from: square,
-                        to: freeSquare2
-                    } as Move
-                    if(!this.anyKingInCheckAfterMove(checkMoveForCheck)) {
-                        possibleDestinations.push(freeSquare2)
+            } else if(color === ChessColors.White) {
+                if(this.state.WhiteKingSideCastle) {
+                    let freeSquare1 = this.getSquare(row, col + 1)
+                    let freeSquare2 = this.getSquare(row, col + 2)
+                    if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty) {
+                        let checkMoveForCheck = {
+                            from: square,
+                            to: freeSquare2
+                        } as Move
+
+                        if(!this.kingInCheckAfterMove(checkMoveForCheck)) {
+                            possibleDestinations.push(freeSquare2)
+                        }
                     }
                 }
-            }
-            if(this.state.WhiteQueenSideCastle) {
-                let freeSquare1 = this.getSquare(row, col - 1)
-                let freeSquare2 = this.getSquare(row, col - 2)
-                let freeSquare3 = this.getSquare(row, col - 3)
-                if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare3.row, freeSquare3.column, grid).type === ChessPieceEnum.Empty) {
-                    let checkMoveForCheck = {
-                        from: square,
-                        to: freeSquare2
-                    } as Move
-                    if(!this.anyKingInCheckAfterMove(checkMoveForCheck)) {
-                        possibleDestinations.push(freeSquare2)
+                if(this.state.WhiteQueenSideCastle) {
+                    let freeSquare1 = this.getSquare(row, col - 1)
+                    let freeSquare2 = this.getSquare(row, col - 2)
+                    let freeSquare3 = this.getSquare(row, col - 3)
+                    if(this.getPieceOnSquare(freeSquare1.row, freeSquare1.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare2.row, freeSquare2.column, grid).type === ChessPieceEnum.Empty && this.getPieceOnSquare(freeSquare3.row, freeSquare3.column, grid).type === ChessPieceEnum.Empty) {
+                        let checkMoveForCheck = {
+                            from: square,
+                            to: freeSquare2
+                        } as Move
+                 
+                        if(!this.kingInCheckAfterMove(checkMoveForCheck)) {
+                            possibleDestinations.push(freeSquare2)
+                        }
                     }
                 }
             }
@@ -515,7 +611,7 @@ class ChessGame extends Component<ChessGameProps, State> {
         return ((square.column >= 0 && square.column <= 7) && (square.row >= 0 && square.row <= 7))
     }
 
-    anyKingInCheckAfterMove = (move: Move) => {
+    kingInCheckAfterMove = (move: Move) => {
         let nextMoveGrid : ChessPieceModel[][]
 
         nextMoveGrid = this.state.Grid.map(item => ({...item}))
@@ -524,20 +620,22 @@ class ChessGame extends Component<ChessGameProps, State> {
         nextMoveGrid[move.from.row][move.from.column] = EmptySpace
         nextMoveGrid[move.to.row][move.to.column] = movedPiece
 
-        console.log(nextMoveGrid)
+        return this.currentlyInCheck(nextMoveGrid)
+    }
 
+    currentlyInCheck = (grid: ChessPieceModel[][]) => {
         for(let i = 0; i < 8; i++) {
             for(let j = 0; j < 8; j++) {
                 
-                let piece = nextMoveGrid[i][j]
+                let piece = grid[i][j]
                 let opposite = (this.state.PlayersTurn === ChessColors.White) ? ChessColors.Black : ChessColors.White
 
-                if(piece.color === opposite) {
-                    let possibleMoves = this.getPossibleMovesForSquare(this.getSquare(i, j), piece, nextMoveGrid)     
+                if(piece.color === opposite && piece.type !== ChessPieceEnum.King) {
+                    let possibleMoves = this.getPossibleMovesForSquare(this.getSquare(i, j), piece, grid)     
                             
                     for(let k = 0; k < possibleMoves.length; k++) {
                         let possibleMove = possibleMoves[k]
-                        if(nextMoveGrid[possibleMove.row][possibleMove.column].type === ChessPieceEnum.King && nextMoveGrid[possibleMove.row][possibleMove.column].color === this.state.PlayersTurn) {
+                        if(grid[possibleMove.row][possibleMove.column].type === ChessPieceEnum.King && grid[possibleMove.row][possibleMove.column].color === this.state.PlayersTurn) {
                             return true;
                         }
                     }
