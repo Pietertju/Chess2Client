@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { ChessColors, ChessPieceEnum, ChessPieceModel } from "../Models/ChessPiece";
-import { BlackPawn, BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, EmptySpace, WhitePawn, WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing } from "../Models/ChessPieces";
-import { Move } from "../Models/Move";
-import { Square } from "../Models/Square";
+import { ChessColors, ChessPieceEnum, ChessPieceModel } from "../../Models/ChessPiece";
+import { BlackPawn, BlackRook, BlackKnight, BlackBishop, BlackQueen, BlackKing, EmptySpace, WhitePawn, WhiteRook, WhiteKnight, WhiteBishop, WhiteQueen, WhiteKing } from "../../Models/ChessPieces";
+import { Move } from "../../Models/Move";
+import { Square } from "../../Models/Square";
 import ChessBoard from "./ChessBoard";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';

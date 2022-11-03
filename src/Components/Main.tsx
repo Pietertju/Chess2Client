@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ChessGame from "./ChessGame";
+import ChessGame from "./Chess/ChessGame";
 
 interface State {
     
