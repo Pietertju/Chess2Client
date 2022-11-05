@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import Main from './Components/Main';
+import Main from './Components/General/Main';
 import 'bootstrap/dist/css/bootstrap.css';
 
 const root = ReactDOM.createRoot(

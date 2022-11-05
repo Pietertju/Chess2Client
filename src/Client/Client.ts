@@ -4,13 +4,45 @@
 // </auto-generated>
 //----------------------
 
+import { ProfileData } from "../Models/ProfileData";
 import { JWTBase } from "./JWTBase";
 
 /* tslint:disable */
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-export class Client extends JWTBase {
+export interface IClient {
+
+    /**
+     * @return Success
+     */
+    getUsers(): Promise<GetUsersResponse>;
+
+    /**
+     * @return Success
+     */
+    checkLogin(): Promise<IsLoggedInResponse>;
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    login(body?: LoginModel | undefined): Promise<LoginResponse>;
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    registerUser(body?: RegisterModel | undefined): Promise<AuthenticationResponse>;
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    registerAdmin(body?: RegisterModel | undefined): Promise<AuthenticationResponse>;
+}
+
+export class Client extends JWTBase implements IClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -38,7 +70,7 @@ export class Client extends JWTBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.processGetUsers(_response);
+            return this.transformResult(url_, _response, (_response: Response) => this.processGetUsers(_response));
         });
     }
 
@@ -48,15 +80,13 @@ export class Client extends JWTBase {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = GetUsersResponse.fromJS(resultData200);
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as GetUsersResponse;
             return result200;
             });
         } else if (status === 404) {
             return response.text().then((_responseText) => {
             let result404: any = null;
-            let resultData404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result404 = AuthenticationResponse.fromJS(resultData404);
+            result404 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return throwException("Not Found", status, _responseText, _headers, result404);
             });
         } else if (status !== 200 && status !== 204) {
@@ -84,7 +114,7 @@ export class Client extends JWTBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.processCheckLogin(_response);
+            return this.transformResult(url_, _response, (_response: Response) => this.processCheckLogin(_response));
         });
     }
 
@@ -94,8 +124,7 @@ export class Client extends JWTBase {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = IsLoggedInResponse.fromJS(resultData200);
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as IsLoggedInResponse;
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -110,7 +139,7 @@ export class Client extends JWTBase {
      * @param body (optional) 
      * @return Success
      */
-    login(body: LoginModel | undefined): Promise<LoginResponse> {
+    login(body?: LoginModel | undefined): Promise<LoginResponse> {
         let url_ = this.baseUrl + "/api/Authenticate/login";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -128,7 +157,7 @@ export class Client extends JWTBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.processLogin(_response);
+            return this.transformResult(url_, _response, (_response: Response) => this.processLogin(_response));
         });
     }
 
@@ -138,15 +167,13 @@ export class Client extends JWTBase {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = LoginResponse.fromJS(resultData200);
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as LoginResponse;
             return result200;
             });
         } else if (status === 401) {
             return response.text().then((_responseText) => {
             let result401: any = null;
-            let resultData401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result401 = AuthenticationResponse.fromJS(resultData401);
+            result401 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return throwException("Unauthorized", status, _responseText, _headers, result401);
             });
         } else if (status !== 200 && status !== 204) {
@@ -161,7 +188,7 @@ export class Client extends JWTBase {
      * @param body (optional) 
      * @return Success
      */
-    registerUser(body: RegisterModel | undefined): Promise<AuthenticationResponse> {
+    registerUser(body?: RegisterModel | undefined): Promise<AuthenticationResponse> {
         let url_ = this.baseUrl + "/api/Authenticate/register-user";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -179,7 +206,7 @@ export class Client extends JWTBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.processRegisterUser(_response);
+            return this.transformResult(url_, _response, (_response: Response) => this.processRegisterUser(_response));
         });
     }
 
@@ -189,15 +216,13 @@ export class Client extends JWTBase {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AuthenticationResponse.fromJS(resultData200);
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return result200;
             });
         } else if (status === 500) {
             return response.text().then((_responseText) => {
             let result500: any = null;
-            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result500 = AuthenticationResponse.fromJS(resultData500);
+            result500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return throwException("Server Error", status, _responseText, _headers, result500);
             });
         } else if (status !== 200 && status !== 204) {
@@ -212,7 +237,7 @@ export class Client extends JWTBase {
      * @param body (optional) 
      * @return Success
      */
-    registerAdmin(body: RegisterModel | undefined): Promise<AuthenticationResponse> {
+    registerAdmin(body?: RegisterModel | undefined): Promise<AuthenticationResponse> {
         let url_ = this.baseUrl + "/api/Authenticate/register-admin";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -230,7 +255,7 @@ export class Client extends JWTBase {
         return this.transformOptions(options_).then(transformedOptions_ => {
             return this.http.fetch(url_, transformedOptions_);
         }).then((_response: Response) => {
-            return this.processRegisterAdmin(_response);
+            return this.transformResult(url_, _response, (_response: Response) => this.processRegisterAdmin(_response));
         });
     }
 
@@ -240,15 +265,13 @@ export class Client extends JWTBase {
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = AuthenticationResponse.fromJS(resultData200);
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return result200;
             });
         } else if (status === 500) {
             return response.text().then((_responseText) => {
             let result500: any = null;
-            let resultData500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result500 = AuthenticationResponse.fromJS(resultData500);
+            result500 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AuthenticationResponse;
             return throwException("Server Error", status, _responseText, _headers, result500);
             });
         } else if (status !== 200 && status !== 204) {
@@ -260,212 +283,38 @@ export class Client extends JWTBase {
     }
 }
 
-export class AuthenticationResponse implements IAuthenticationResponse {
-
-    constructor(data?: IAuthenticationResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): AuthenticationResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new AuthenticationResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
+export interface AuthenticationResponse {
+    status: string;
+    message: string;
 }
 
-export interface IAuthenticationResponse {
+export interface GetUsersResponse {
+    users: ProfileData[];
 }
 
-export class GetUsersResponse implements IGetUsersResponse {
-
-    constructor(data?: IGetUsersResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): GetUsersResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new GetUsersResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
+export interface IsLoggedInResponse {
+    user: ProfileData;
 }
 
-export interface IGetUsersResponse {
-}
-
-export class IsLoggedInResponse implements IIsLoggedInResponse {
-
-    constructor(data?: IIsLoggedInResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): IsLoggedInResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new IsLoggedInResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
-}
-
-export interface IIsLoggedInResponse {
-}
-
-export class LoginModel implements ILoginModel {
-    username!: string;
-    password!: string;
-
-    constructor(data?: ILoginModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.username = _data["username"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): LoginModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["username"] = this.username;
-        data["password"] = this.password;
-        return data;
-    }
-}
-
-export interface ILoginModel {
+export interface LoginModel {
     username: string;
     password: string;
 }
 
-export class LoginResponse implements ILoginResponse {
-
-    constructor(data?: ILoginResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-    }
-
-    static fromJS(data: any): LoginResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        return data;
-    }
+export interface LoginResponse {
+    token: string;
+    expirationDate: Date;
+    user: ProfileData;
 }
 
-export interface ILoginResponse {
-}
-
-export class RegisterModel implements IRegisterModel {
-    username!: string;
-    email!: string;
-    password!: string;
-
-    constructor(data?: IRegisterModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.username = _data["username"];
-            this.email = _data["email"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): RegisterModel {
-        data = typeof data === 'object' ? data : {};
-        let result = new RegisterModel();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["username"] = this.username;
-        data["email"] = this.email;
-        data["password"] = this.password;
-        return data;
-    }
-}
-
-export interface IRegisterModel {
+export interface RegisterModel {
     username: string;
     email: string;
     password: string;
 }
 
 export class ApiException extends Error {
-    message: string;
+    override message: string;
     status: number;
     response: string;
     headers: { [key: string]: any; };

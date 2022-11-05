@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { ChessColors, ChessPieceModel } from "../../Models/ChessPiece";
 import ChessSquare from "./ChessSquare";
-import '../Styles/ChessBoard.scss';
+import '../../Styles/ChessBoard.scss';
 import { Square } from "../../Models/Square";
 import { Move } from "../../Models/Move";
 

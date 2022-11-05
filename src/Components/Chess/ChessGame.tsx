@@ -6,6 +6,8 @@ import { Square } from "../../Models/Square";
 import ChessBoard from "./ChessBoard";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import '../../Styles/ChessGame.scss';
+
 
 interface State {
     PlayersTurn: ChessColors
@@ -201,9 +203,7 @@ class ChessGame extends Component<ChessGameProps, State> {
             WhiteKingSideCastle: whiteKingSideCastle,
             WhiteQueenSideCastle: whiteQueenSideCastle,
             PromotionModal: promotion
-        }), () => {
-            console.log(this.state.PreviousMoves)
-        })
+        }))
 
         this.SelectPiece(this.state.SelectedSquare)
     }
