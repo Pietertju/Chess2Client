@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { BrowserRouter } from "react-router-dom";
 import { Client, IsLoggedInResponse, LoginModel } from "../../Client/Client";
 import { ProfileData } from "../../Models/ProfileData";
-import ChessGame from "../Chess/ChessGame";
 import ErrorMessage from "../ErrorMessage";
 import HeaderMenu from "./HeaderMenu";
 import MainBody from "./MainBody";
