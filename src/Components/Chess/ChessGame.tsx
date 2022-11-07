@@ -7,6 +7,7 @@ import ChessBoard from "./ChessBoard";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import '../../Styles/ChessGame.scss';
+import { useParams } from "react-router-dom";
 
 
 interface State {
@@ -23,7 +24,7 @@ interface State {
 }
 
 interface ChessGameProps {
-    
+    match: any
 }
 
 class ChessGame extends Component<ChessGameProps, State> {   
@@ -46,7 +47,7 @@ class ChessGame extends Component<ChessGameProps, State> {
             BlackKingSideCastle: true,
             BlackQueenSideCastle: true,
             PreviousMoves: [] as Move[],
-            PromotionModal: false
+            PromotionModal: false,
         }
     }
 
@@ -55,12 +56,14 @@ class ChessGame extends Component<ChessGameProps, State> {
             <div className="ChessGame">
                 <ChessBoard SelectedPiece={(this.inBounds(this.state.SelectedSquare)) ? this.state.Grid[this.state.SelectedSquare.row][this.state.SelectedSquare.column] as ChessPieceModel : { type: ChessPieceEnum.Empty, color: ChessColors.Empty } as ChessPieceModel} MakeMove={this.MakeMove} PossibleDestinations={this.state.PossibleDestinations} SelectedSquare={this.state.SelectedSquare} SelectPiece={this.SelectPiece} PlayersTurn={this.state.PlayersTurn} grid={this.state.Grid} />
                 <h1>Move: {this.state.PlayersTurn}</h1>
-
+                <h2>A: {this.props.match.params.gameId}</h2>
                 <Modal show={this.state.PromotionModal as boolean} onHide={this.hideModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Promotion</Modal.Title>
                     </Modal.Header>
-                <Modal.Body>Woohoo, you're promoting your pawn! To which piece do you want to promote</Modal.Body>
+                    <Modal.Body>
+                        Woohoo, you're promoting your pawn! To which piece do you want to promote
+                    </Modal.Body>
                     <Modal.Footer>
                         <Button variant="primary" onClick={() => {this.hideModal(); this.promotePiece(ChessPieceEnum.Queen)}}>
                             Queen

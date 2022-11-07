@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useParams } from "react-router-dom";
 import { ProfileData } from "../../Models/ProfileData";
 import "../../Styles/MainBody.scss"
 import LoginPage from "../AccountPages/LoginPage";
@@ -36,13 +36,17 @@ class MainBody extends Component<MainBodyProps, State> {
     }
 
     render() {
+        const Wrapper = (props: any) => {
+            const params = useParams();
+            return <ChessGame {...{...props, match: {params}} } />
+        }
         return(
             <Routes>
                 <Route path="/" element={<h1>Logged in currently: {this.props.LoggedIn ? "True" : "false"}</h1> }/>
                 <Route path="/register" element={<RegisterPage raiseException={this.props.raiseException} removeException={this.props.removeException}/>}/>
                 <Route path="/login" element={<LoginPage logout={this.props.logout} LoggedIn={this.props.LoggedIn} User={this.props.User} login={(username: string, password: string) => {this.login(username, password)}}/> }/>
                 <Route path="/profile" element={<ProfilePage LoggedIn={this.props.LoggedIn} User={this.props.User}/> }/>
-                <Route path="/chess" element={<ChessGame />} />
+                <Route path="/chess/:gameId" element={<Wrapper />} />
             </Routes>  
         )
     }

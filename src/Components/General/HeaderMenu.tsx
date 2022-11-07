@@ -40,7 +40,7 @@ class HeaderMenu extends Component<HeaderMenuProps, State> {
                         <Nav.Link as={Link} disabled={!this.props.LoggedIn as boolean} to="/profile" eventKey="profile">Profile</Nav.Link>
                     </Nav.Item>
                     <Nav.Item as="li">
-                        <Nav.Link as={Link} disabled={!this.props.LoggedIn as boolean} to="/chess" eventKey="chess">Chess</Nav.Link>
+                        <Nav.Link as={Link} to="/chess" eventKey="chess">Chess</Nav.Link>
                     </Nav.Item>
                 </Nav>
             </div>
